@@ -108,11 +108,11 @@ const connect = () => {
             await sendMessage(`remove: {"server_port": ${ f.server_port }}`);
           } else if (account.password !== f.password) {
             await sendMessage(`remove: {"server_port": ${ f.server_port }}`);
-            await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }"}`);
+            await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }", "mode":"tcp_and_udp"}`);
           }
           // else if (account.method && account.method !== f.method) {
           //   await sendMessage(`remove: {"server_port": ${ f.server_port }}`);
-          //   await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }"}`);
+          //   await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }", "mode":"tcp_and_udp"}`);
           // }
         });
       }
@@ -152,7 +152,7 @@ const startUp = async () => {
   }
   const accounts = await knex('account').select([ 'port', 'password' ]);
   for(const account of accounts) {
-    await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }"}`);
+    await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }", "mode":"tcp_and_udp"}`);
   }
 };
 
@@ -163,7 +163,7 @@ const resend = async () => {
   const accounts = await knex('account').select([ 'port', 'password' ]);
   for(const account of accounts) {
     if(!existPort.includes(account.port)) {
-      await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }"}`);
+      await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }", "mode":"tcp_and_udp"}`);
     }
   }
 };
@@ -189,7 +189,7 @@ const compareWithLastFlow = async (flow, lastFlow) => {
         const account = await knex('account').where({ port: +f }).then(s => s[0]);
         if(account) {
           await sendMessage(`remove: {"server_port": ${ account.port }}`);
-          await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }"}`);
+          await sendMessage(`add: {"server_port": ${ account.port }, "password": "${ account.password }", "mode":"tcp_and_udp"}`);
         }
       }
     } else {
@@ -240,7 +240,7 @@ const addAccount = async (port, password) => {
     if(!checkPortRange(port)) {
       return Promise.reject('error');
     }
-    await sendMessage(`add: {"server_port": ${ port }, "password": "${ password }"}`);
+    await sendMessage(`add: {"server_port": ${ port }, "password": "${ password }", "mode":"tcp_and_udp"}`);
     await knex('account').insert({ port, password });
     return { port, password };
   } catch(err) {
@@ -275,7 +275,7 @@ const changePassword = async (port, password) => {
       return Promise.reject('error');
     }
     await sendMessage(`remove: {"server_port": ${ port }}`);
-    await sendMessage(`add: {"server_port": ${ port }, "password": "${ password }"}`);
+    await sendMessage(`add: {"server_port": ${ port }, "password": "${ password }", "mode":"tcp_and_udp"}`);
     return { port, password };
   } catch(err) {
     return Promise.reject('error');
